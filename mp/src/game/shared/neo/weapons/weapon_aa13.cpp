@@ -75,20 +75,6 @@ void CWeaponAA13::UpdatePenaltyTime()
 	}
 }
 
-void CWeaponAA13::ItemPreFrame()
-{
-	UpdatePenaltyTime();
-
-	BaseClass::ItemPreFrame();
-}
-
-void CWeaponAA13::ItemBusyFrame()
-{
-	UpdatePenaltyTime();
-
-	BaseClass::ItemBusyFrame();
-}
-
 void CWeaponAA13::ItemPostFrame()
 {
 	ProcessAnimationEvents();

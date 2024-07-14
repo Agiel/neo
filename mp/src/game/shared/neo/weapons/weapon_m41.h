@@ -34,8 +34,6 @@ public:
 	CWeaponM41();
 
 	void	ItemPostFrame(void);
-	void	ItemPreFrame(void);
-	void	ItemBusyFrame(void);
 	virtual void	PrimaryAttack(void) OVERRIDE { if (!ShootingIsPrevented()) { BaseClass::PrimaryAttack(); } }
 	virtual void	SecondaryAttack(void) OVERRIDE { if (!ShootingIsPrevented()) { BaseClass::SecondaryAttack(); } }
 	void	AddViewKick(void);
@@ -46,14 +44,15 @@ public:
 
 	virtual float GetSpeedScale(void) const { return 145.0 / 170.0; }
 
-	void	UpdatePenaltyTime(void);
+	virtual Vector GetMinConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_4DEGREES; return cone; }
+	virtual Vector GetMaxConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_7DEGREES; return cone; }
+	virtual Vector GetMinConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_PRECALCULATED; return cone; }
+	virtual Vector GetMaxConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_3DEGREES; return cone; }
 
 	Activity	GetPrimaryAttackActivity(void);
 
 protected:
 	virtual float GetFastestDryRefireTime() const OVERRIDE { return 0.2f; }
-	virtual float GetAccuracyPenalty() const OVERRIDE { return 0.2f; }
-	virtual float GetMaxAccuracyPenalty() const OVERRIDE { return 1.5f; }
 
 private:
 	CWeaponM41(const CWeaponM41& other);

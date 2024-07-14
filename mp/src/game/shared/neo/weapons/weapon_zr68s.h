@@ -34,30 +34,26 @@ public:
 	CWeaponZR68S();
 
 	virtual void	ItemPostFrame(void) OVERRIDE;
-	virtual void	ItemPreFrame(void) OVERRIDE;
-	virtual void	ItemBusyFrame(void) OVERRIDE;
 	virtual void	PrimaryAttack(void) OVERRIDE { if (!ShootingIsPrevented()) { BaseClass::PrimaryAttack(); } }
 	virtual void	SecondaryAttack(void) OVERRIDE { if (!ShootingIsPrevented()) { BaseClass::SecondaryAttack(); } }
 	virtual void	AddViewKick(void) OVERRIDE;
 
 	void	DryFire(void);
 
-	virtual void Spawn(void) OVERRIDE;
-	virtual bool Deploy(void) OVERRIDE;
-
 	virtual NEO_WEP_BITS_UNDERLYING_TYPE GetNeoWepBits(void) const OVERRIDE { return NEO_WEP_ZR68_S | NEO_WEP_SUPPRESSED; }
 	virtual int GetNeoWepXPCost(const int neoClass) const OVERRIDE { return 0; }
 
 	virtual float GetSpeedScale(void) const OVERRIDE { return 155.0 / 170.0; }
 
-	void	UpdatePenaltyTime(void);
+	virtual Vector GetMinConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_4DEGREES; return cone; }
+	virtual Vector GetMaxConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_7DEGREES; return cone; }
+	virtual Vector GetMinConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_PRECALCULATED; return cone; }
+	virtual Vector GetMaxConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_3DEGREES; return cone; }
 
 	virtual Activity	GetPrimaryAttackActivity(void) OVERRIDE;
 
 protected:
 	virtual float GetFastestDryRefireTime() const OVERRIDE { return 0.2f; }
-	virtual float GetAccuracyPenalty() const OVERRIDE { return 0.2f; }
-	virtual float GetMaxAccuracyPenalty() const OVERRIDE { return 1.5f; }
 
 private:
 	CWeaponZR68S(const CWeaponZR68S &other);

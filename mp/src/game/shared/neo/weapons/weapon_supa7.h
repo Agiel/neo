@@ -39,6 +39,8 @@ public:
 
 	virtual float GetSpeedScale(void) const OVERRIDE { return 140.0 / 170.0; }
 
+	virtual const Vector& GetBulletSpread(void) OVERRIDE { static const Vector cone = VECTOR_CONE_5DEGREES; return cone; };
+
 	virtual int GetMinBurst() OVERRIDE { return 1; }
 	virtual int GetMaxBurst() OVERRIDE { return 3; }
 
@@ -56,15 +58,13 @@ public:
 	void PrimaryAttack(void);
 	void SecondaryAttack(void);
 	void DryFire(void);
-	
+
 	void Drop(const Vector& vecVelocity) OVERRIDE;
 
 	void ClearDelayedInputs(void);
 
 protected:
 	virtual float GetFastestDryRefireTime() const OVERRIDE { return 0.2f; }
-	virtual float GetAccuracyPenalty() const OVERRIDE { return 0; }
-	virtual float GetMaxAccuracyPenalty() const OVERRIDE { return 0; }
 
 private:
 	// Purpose: Only update next attack time if it's further away in the future.

@@ -27,16 +27,19 @@ public:
 
 	virtual void	PrimaryAttack(void) OVERRIDE;
 	virtual void	SecondaryAttack(void) OVERRIDE { if (!ShootingIsPrevented()) { BaseClass::SecondaryAttack(); } }
-	
+
 	virtual NEO_WEP_BITS_UNDERLYING_TYPE GetNeoWepBits(void) const { return NEO_WEP_KYLA; }
 	virtual int GetNeoWepXPCost(const int neoClass) const { return 0; }
 
 	virtual float GetSpeedScale(void) const { return 1.0; }
 
+	virtual Vector GetMinConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_5DEGREES; return cone; }
+	virtual Vector GetMaxConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_7DEGREES; return cone; }
+	virtual Vector GetMinConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_2DEGREES; return cone; }
+	virtual Vector GetMaxConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_4DEGREES; return cone; }
+
 protected:
 	virtual float GetFastestDryRefireTime() const OVERRIDE { return 0.2f; }
-	virtual float GetAccuracyPenalty() const OVERRIDE { return 0.2f; }
-	virtual float GetMaxAccuracyPenalty() const OVERRIDE { return 0.5f; }
 
 private:
 	CWeaponKyla(const CWeaponKyla &other);

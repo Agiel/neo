@@ -33,16 +33,11 @@ public:
 
 	CWeaponMilso();
 
-	void	Precache(void);
 	void	ItemPostFrame(void);
-	void	ItemPreFrame(void);
-	void	ItemBusyFrame(void);
 	virtual void	PrimaryAttack(void) OVERRIDE { if (!ShootingIsPrevented()) { BaseClass::PrimaryAttack(); } }
 	virtual void	SecondaryAttack(void) OVERRIDE { if (!ShootingIsPrevented()) { BaseClass::SecondaryAttack(); } }
 	void	AddViewKick(void);
 	void	DryFire(void);
-
-	void	UpdatePenaltyTime(void);
 
 	Activity	GetPrimaryAttackActivity(void);
 
@@ -51,10 +46,13 @@ public:
 
 	virtual float GetSpeedScale(void) const { return 1.0; }
 
+	virtual Vector GetMinConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_4DEGREES; return cone; }
+	virtual Vector GetMaxConeHip() const OVERRIDE { static Vector cone = VECTOR_CONE_7DEGREES; return cone; }
+	virtual Vector GetMinConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_2DEGREES; return cone; }
+	virtual Vector GetMaxConeAim() const OVERRIDE { static Vector cone = VECTOR_CONE_4DEGREES; return cone; }
+
 protected:
 	virtual float GetFastestDryRefireTime() const OVERRIDE { return 0.2f; }
-	virtual float GetAccuracyPenalty() const OVERRIDE { return 0.2f; }
-	virtual float GetMaxAccuracyPenalty() const OVERRIDE { return 0.2f; }
 
 private:
 	CWeaponMilso(const CWeaponMilso &other);
