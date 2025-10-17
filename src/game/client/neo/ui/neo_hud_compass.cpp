@@ -150,6 +150,61 @@ void CNEOHud_Compass::DrawNeoHudElement(void)
 								  (m_resY * cl_neo_hud_rangefinder_pos_frac_y.GetFloat()));
 		surface()->DrawPrintText(m_wszRangeFinder, ARRAYSIZE(m_wszRangeFinder) - 1);
 	}
+
+	auto player = GetFirstPersonPlayer();
+	wchar_t speed[11] = L"SPEED 9999";
+	int labelWidth, labelHeight;
+	surface()->DrawSetTextColor(COLOR_NEO_WHITE);
+	surface()->DrawSetTextFont(m_hFont);
+	surface()->GetTextSize(m_hFont, speed, labelWidth, labelHeight);
+	surface()->DrawSetTextPos((m_resX / 2 - labelWidth / 2),
+		m_resY / 2 + 200);
+	V_swprintf_safe(speed, L"SPEED %3.0f", (float)player->GetAbsVelocity().Length2D());
+	surface()->DrawPrintText(speed, ARRAYSIZE(speed) - 1);
+
+	if (player->m_nButtons & IN_FORWARD)
+	{
+		surface()->DrawSetTextPos(m_resX / 2,
+			m_resY / 2 - 50);
+		surface()->DrawPrintText(L"F", 1);
+	}
+	if (player->m_nButtons & IN_BACK)
+	{
+		surface()->DrawSetTextPos(m_resX / 2,
+			m_resY / 2 + 50);
+		surface()->DrawPrintText(L"B", 1);
+	}
+	if (player->m_nButtons & IN_MOVELEFT)
+	{
+		surface()->DrawSetTextPos(m_resX / 2 - 50,
+			m_resY / 2);
+		surface()->DrawPrintText(L"L", 1);
+	}
+	if (player->m_nButtons & IN_MOVERIGHT)
+	{
+		surface()->DrawSetTextPos(m_resX / 2 + 50,
+			m_resY / 2);
+		surface()->DrawPrintText(L"R", 1);
+	}
+	if (player->m_nButtons & IN_SPEED)
+	{
+		surface()->DrawSetTextPos(m_resX / 2 - 140,
+			m_resY / 2 + 25);
+		surface()->DrawPrintText(L"SPRINT", 6);
+	}
+	if (player->m_nButtons & IN_DUCK)
+	{
+		surface()->DrawSetTextPos(m_resX / 2 - 140,
+			m_resY / 2 + 50);
+		surface()->DrawPrintText(L"CROUCH", 6);
+	}
+	if (player->m_nButtons & IN_JUMP)
+	{
+		surface()->DrawSetTextPos(m_resX / 2 + 70,
+			m_resY / 2 + 50);
+		surface()->DrawPrintText(L"JUMP", 4);
+	}
+	
 }
 
 void CNEOHud_Compass::ApplySchemeSettings(vgui::IScheme *pScheme)

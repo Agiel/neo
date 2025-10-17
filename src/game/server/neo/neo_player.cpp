@@ -708,7 +708,7 @@ void CNEO_Player::CalculateSpeed(void)
 			case NEO_CLASS_ASSAULT:
 			case NEO_CLASS_VIP:
 			case NEO_CLASS_JUGGERNAUT:
-				speed *= NEO_ASSAULT_SPRINT_MODIFIER;
+				speed *= NEO_JUGGERNAUT_SPRINT_MODIFIER;
 				break;
 			case NEO_CLASS_SUPPORT:
 				speed *= NEO_SUPPORT_SPRINT_MODIFIER; // Should never happen
@@ -731,7 +731,7 @@ void CNEO_Player::CalculateSpeed(void)
 	speed = MAX(speed, 55);
 
 	// Slowdown after jumping
-	if (m_iNeoClass != NEO_CLASS_RECON)
+	if (m_iNeoClass != NEO_CLASS_RECON && m_HL2Local.m_slideTime == 0)
 	{
 		const float timeSinceJumping = gpGlobals->curtime - m_flJumpLastTime;
 		constexpr float SLOWDOWN_TIME = 1.15f;
@@ -920,6 +920,9 @@ void CNEO_Player::HandleSpeedChanges( CMoveData *mv )
 }
 #endif
 
+extern ConVar sv_neo_slidetime_gain;
+extern ConVar sv_neo_slidetime_max;
+
 void CNEO_Player::PreThink(void)
 {
 	SpectatorTakeoverPlayerPreThink();
@@ -1004,10 +1007,27 @@ void CNEO_Player::PreThink(void)
 		{
 			newNetAirborneVal = true;
 		}
+
+		if (m_iNeoClass == NEO_CLASS_JUGGERNAUT && GetAbsVelocity().z < 0)
+		{
+			m_HL2Local.m_slideTime = Min(m_HL2Local.m_slideTime + sv_neo_slidetime_gain.GetFloat() * gpGlobals->frametime, sv_neo_slidetime_max.GetFloat());
+		}
 	}
 	else
 	{
 		newNetAirborneVal = false;
+
+		if (m_iNeoClass == NEO_CLASS_JUGGERNAUT)
+		{
+			if (m_Local.m_bDucked && m_HL2Local.m_slideTime > 0)
+			{
+				m_HL2Local.m_slideTime = Max(m_HL2Local.m_slideTime - gpGlobals->frametime, 0.0f);
+			}
+			else
+			{
+				m_HL2Local.m_slideTime = 0.0f;
+			}
+		}
 	}
 	// Only send the network update if we actually changed state
 	if (m_bHasBeenAirborneForTooLongToSuperJump != newNetAirborneVal)
@@ -3364,6 +3384,7 @@ void CNEO_Player::BecomeJuggernaut()
 	m_Local.m_flDucktime = 0.0f;
 	m_Local.m_flDuckJumpTime = 0.0f;
 	m_Local.m_flJumpTime = 0.0f;
+	m_HL2Local.m_slideTime = 0.0f;
 	if (GetToggledDuckState())
 	{
 		ToggleDuck();

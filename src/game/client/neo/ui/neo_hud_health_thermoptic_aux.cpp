@@ -104,6 +104,8 @@ void CNEOHud_HTA::DrawBuildInfo() const
 
 ConVar cl_neo_hud_health_as_percentage("cl_neo_hud_health_as_percentage", "1", FCVAR_ARCHIVE,
 	"Health display mode", true, 0, true, 1);
+extern ConVar sv_neo_slidetime_max;
+
 void CNEOHud_HTA::DrawHTA() const
 {
 	auto player = C_NEO_Player::GetLocalNEOPlayer();
@@ -122,8 +124,13 @@ void CNEOHud_HTA::DrawHTA() const
 
 	const int displayedHealth = player->GetDisplayedHealth(cl_neo_hud_health_as_percentage.GetBool());
 	const int health = player->GetHealth();
-	const int thermopticValue = static_cast<int>(roundf(player->m_HL2Local.m_cloakPower));
-	const float thermopticPercent = player->CloakPower_CurrentVisualPercentage();
+	int thermopticValue = static_cast<int>(roundf(player->m_HL2Local.m_cloakPower));
+	float thermopticPercent = player->CloakPower_CurrentVisualPercentage();
+	if (player->GetClass() == NEO_CLASS_JUGGERNAUT)
+	{
+		thermopticPercent = player->m_HL2Local.m_slideTime * 100.0f / sv_neo_slidetime_max.GetFloat();
+		thermopticValue = static_cast<int>(roundf(thermopticPercent));
+	}
 	const int aux = player->m_HL2Local.m_flSuitPower;
 	const bool playerIsNotSupport = (player->GetClass() != NEO_CLASS_SUPPORT);
 	const bool playerIsNotJuggernaut = (player->GetClass() != NEO_CLASS_JUGGERNAUT);
@@ -154,12 +161,9 @@ void CNEOHud_HTA::DrawHTA() const
 	surface()->DrawPrintText(L"INTEGRITY", 9);
 	if (playerIsNotSupport)
 	{
-		if (playerIsNotJuggernaut)
-		{
-			surface()->DrawSetTextColor(m_camoTextColor);
-			surface()->DrawSetTextPos(camotext_xpos + xpos, camotext_ypos + ypos);
-			surface()->DrawPrintText(L"THERM-OPTIC", 11);
-		}
+		surface()->DrawSetTextColor(m_camoTextColor);
+		surface()->DrawSetTextPos(camotext_xpos + xpos, camotext_ypos + ypos);
+		surface()->DrawPrintText(playerIsNotJuggernaut ? L"THERM-OPTIC" : L"POT. ENERGY", 11);
 		surface()->DrawSetTextColor(m_sprintTextColor);
 		surface()->DrawSetTextPos(sprinttext_xpos + xpos, sprinttext_ypos + ypos);
 		surface()->DrawPrintText(L"AUX POWER", 9);
@@ -172,13 +176,10 @@ void CNEOHud_HTA::DrawHTA() const
 	surface()->DrawPrintText(unicodeValue_Integrity, valLen_Integrity);
 	if (playerIsNotSupport)
 	{
-		if (playerIsNotJuggernaut)
-		{
-			surface()->DrawSetTextColor(m_camoTextColor);
-			surface()->GetTextSize(m_hFont, unicodeValue_ThermOptic, fontWidth, fontHeight);
-			surface()->DrawSetTextPos(camonum_xpos + xpos - fontWidth, camonum_ypos + ypos);
-			surface()->DrawPrintText(unicodeValue_ThermOptic, valLen_ThermOptic);
-		}
+		surface()->DrawSetTextColor(m_camoTextColor);
+		surface()->GetTextSize(m_hFont, unicodeValue_ThermOptic, fontWidth, fontHeight);
+		surface()->DrawSetTextPos(camonum_xpos + xpos - fontWidth, camonum_ypos + ypos);
+		surface()->DrawPrintText(unicodeValue_ThermOptic, valLen_ThermOptic);
 		surface()->DrawSetTextColor(m_sprintTextColor);
 		surface()->GetTextSize(m_hFont, unicodeValue_Aux, fontWidth, fontHeight);
 		surface()->DrawSetTextPos(sprintnum_xpos + xpos - fontWidth, sprintnum_ypos + ypos);
@@ -195,23 +196,20 @@ void CNEOHud_HTA::DrawHTA() const
 
 	if (playerIsNotSupport)
 	{
-		if (playerIsNotJuggernaut)
-		{
-			// ThermOptic progress bar
-			surface()->DrawSetColor(m_camoColor);
-			surface()->DrawFilledRect(
-				camobar_xpos + xpos,
-				camobar_ypos + ypos,
-				camobar_xpos + xpos + (camobar_w * (thermopticPercent / 100.0)),
-				camobar_ypos + ypos + camobar_h);
+		// ThermOptic progress bar
+		surface()->DrawSetColor(m_camoColor);
+		surface()->DrawFilledRect(
+			camobar_xpos + xpos,
+			camobar_ypos + ypos,
+			camobar_xpos + xpos + (camobar_w * (thermopticPercent / 100.0)),
+			camobar_ypos + ypos + camobar_h);
 
-			surface()->DrawSetColor(m_camoTextColor);
-			surface()->DrawOutlinedRect(
-				camobar_xpos + xpos,
-				camobar_ypos + ypos,
-				camobar_xpos + xpos + camobar_w,
-				camobar_ypos + ypos + camobar_h);
-		}
+		surface()->DrawSetColor(m_camoTextColor);
+		surface()->DrawOutlinedRect(
+			camobar_xpos + xpos,
+			camobar_ypos + ypos,
+			camobar_xpos + xpos + camobar_w,
+			camobar_ypos + ypos + camobar_h);
 
 		// AUX progress bar
 		surface()->DrawSetColor(m_sprintColor);

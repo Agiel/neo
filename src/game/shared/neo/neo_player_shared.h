@@ -36,6 +36,7 @@
 #define NEO_RECON_SPRINT_MODIFIER 1.35
 #define NEO_ASSAULT_SPRINT_MODIFIER 1.6
 #define NEO_SUPPORT_SPRINT_MODIFIER 1.35 // Redundant, but for future usecases
+#define NEO_JUGGERNAUT_SPRINT_MODIFIER 1.8
 
 // Aim Modifier
 #define NEO_AIM_MODIFIER 0.6

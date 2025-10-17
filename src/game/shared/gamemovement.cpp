@@ -1645,6 +1645,12 @@ void CGameMovement::StepMove( Vector &vecDestination, trace_t &trace )
 	}
 }
 
+#ifdef NEO
+ConVar	sv_slidefriction("sv_neo_slidefriction", "0.5", FCVAR_NOTIFY | FCVAR_REPLICATED, "Crouch slide friction.", true, 0, false, 0);
+ConVar	sv_neo_slidetime_gain("sv_neo_slidetime_gain", "2.5", FCVAR_NOTIFY | FCVAR_REPLICATED, "Slide time gain per second.", true, 0, false, 0);
+ConVar	sv_neo_slidetime_max("sv_neo_slidetime_max", "4.0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Slide time gain per second.", true, 0, false, 0);
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
@@ -1672,7 +1678,19 @@ void CGameMovement::Friction( void )
 	// apply ground friction
 	if (player->GetGroundEntity() != NULL)  // On an entity that is the ground
 	{
+#ifdef NEO
+		auto neoplayer = ToNEOPlayer(player);
+		if (player->m_Local.m_bDucked && neoplayer->m_HL2Local.m_slideTime > 0.0f)
+		{
+			friction = sv_slidefriction.GetFloat() * player->m_surfaceFriction;
+		}
+		else
+		{
+			friction = sv_friction.GetFloat() * player->m_surfaceFriction;
+		}
+#else
 		friction = sv_friction.GetFloat() * player->m_surfaceFriction;
+#endif
 
 		// Bleed off some speed, but if we have less than the bleed
 		//  threshold, bleed the threshold amount.
@@ -2607,6 +2625,8 @@ bool CGameMovement::CheckJumpButton( void )
 	}
 	neoPlayer->DoAnimationEvent(PLAYERANIMEVENT_JUMP);
 	neoPlayer->m_flJumpLastTime = gpGlobals->curtime;
+
+	neoPlayer->m_HL2Local.m_slideTime = 0;
 #endif
 
 	// Acclerate upward

@@ -857,7 +857,7 @@ void C_NEO_Player::CalculateSpeed(void)
 			case NEO_CLASS_ASSAULT:
 			case NEO_CLASS_VIP:
 			case NEO_CLASS_JUGGERNAUT:
-				speed *= NEO_ASSAULT_SPRINT_MODIFIER;
+				speed *= NEO_JUGGERNAUT_SPRINT_MODIFIER;
 				break;
 			case NEO_CLASS_SUPPORT:
 				speed *= NEO_SUPPORT_SPRINT_MODIFIER; // Should never happen
@@ -880,7 +880,7 @@ void C_NEO_Player::CalculateSpeed(void)
 	speed = MAX(speed, 55);
 
 	// Slowdown after jumping
-	if (m_iNeoClass != NEO_CLASS_RECON)
+	if (m_iNeoClass != NEO_CLASS_RECON && m_HL2Local.m_slideTime == 0)
 	{
 		const float timeSinceJumping = gpGlobals->curtime - m_flJumpLastTime;
 		constexpr float SLOWDOWN_TIME = 1.15f;
@@ -1049,6 +1049,8 @@ void C_NEO_Player::HandleSpeedChanges( CMoveData *mv )
 
 extern ConVar sv_infinite_aux_power;
 extern ConVar glow_outline_effect_enable;
+extern ConVar sv_neo_slidetime_gain;
+extern ConVar sv_neo_slidetime_max;
 void C_NEO_Player::PreThink( void )
 {
 	BaseClass::PreThink();
@@ -1155,10 +1157,27 @@ void C_NEO_Player::PreThink( void )
 		{
 			m_bHasBeenAirborneForTooLongToSuperJump = true;
 		}
+
+		if (m_iNeoClass == NEO_CLASS_JUGGERNAUT && GetAbsVelocity().z < 0)
+		{
+			m_HL2Local.m_slideTime = Min(m_HL2Local.m_slideTime + sv_neo_slidetime_gain.GetFloat() * gpGlobals->frametime, sv_neo_slidetime_max.GetFloat());
+		}
 	}
 	else
 	{
 		m_bHasBeenAirborneForTooLongToSuperJump = false;
+
+		if (m_iNeoClass == NEO_CLASS_JUGGERNAUT)
+		{
+			if (m_Local.m_bDucked && m_HL2Local.m_slideTime > 0)
+			{
+				m_HL2Local.m_slideTime = Max(m_HL2Local.m_slideTime - gpGlobals->frametime, 0.0f);
+			}
+			else
+			{
+				m_HL2Local.m_slideTime = 0.0f;
+			}
+		}
 	}
 
 	if (m_iNeoClass == NEO_CLASS_RECON && 

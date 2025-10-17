@@ -2053,6 +2053,10 @@ void CHL2_Player::SuitPower_Update( void )
 					{
 						flPowerLoad -= SuitDeviceSprint.GetDeviceDrainRate();
 					}
+					if (static_cast<CNEO_Player*>(this)->GetClass() == NEO_CLASS_JUGGERNAUT)
+					{
+						flPowerLoad += SuitDeviceSprint.GetDeviceDrainRate() * 4;
+					}
 				}
 #else
 				if ( CloseEnough( fabs( GetAbsVelocity().x ), 0.0f ) && CloseEnough( fabs( GetAbsVelocity().y ), 0.0f ) )

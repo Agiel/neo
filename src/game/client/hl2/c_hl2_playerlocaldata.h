@@ -33,6 +33,7 @@ public:
 #ifdef NEO
 	// In NEO, m_flSuitPower will be treated instead as just running power
 	float	m_cloakPower;
+	float	m_slideTime;
 #endif
 	float	m_flSuitPowerLoad;
 	float	m_flTimeAllSuitDevicesOff;
